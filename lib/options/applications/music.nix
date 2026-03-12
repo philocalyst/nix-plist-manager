@@ -9,7 +9,8 @@
 let
   plistPath = pathLib.generatePath true false "com.apple.Music";
 
-  mkBool = key:
+  mkBool =
+    key:
     abstractionsLib.mkBasicBoolOption {
       path = plistPath;
       default = null;
@@ -46,9 +47,7 @@ in
             command = commandsLib.defaults.delete plistPath optionName;
           };
           "value" = {
-            command =
-              value:
-              commandsLib.defaults.write plistPath optionName "int" "${toString value}";
+            command = value: commandsLib.defaults.write plistPath optionName "int" "${toString value}";
           };
         };
 
@@ -95,13 +94,13 @@ in
             command = commandsLib.defaults.delete plistPath optionName;
           };
           "Automatic" = {
-            command = commandsLib.defaults.write plistPath optionName "int" "20";
+            command = commandsLib.defaults.write plistPath optionName "int" "19";
           };
           "Always On" = {
-            command = commandsLib.defaults.write plistPath optionName "int" "21";
+            command = commandsLib.defaults.write plistPath optionName "int" "20";
           };
           "Off" = {
-            command = commandsLib.defaults.write plistPath optionName "int" "22";
+            command = commandsLib.defaults.write plistPath optionName "int" "21";
           };
         };
     };
@@ -160,9 +159,7 @@ in
             command = commandsLib.defaults.delete plistPath optionName;
           };
           "value" = {
-            command =
-              value:
-              commandsLib.defaults.write plistPath optionName "int" "${toString value}";
+            command = value: commandsLib.defaults.write plistPath optionName "int" "${toString value}";
           };
         };
 
