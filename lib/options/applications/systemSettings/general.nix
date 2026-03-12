@@ -1,214 +1,104 @@
-{ lib, ... }:
+{ lib, commandsLib, typesLib, configLib, pathLib, abstractionsLib }:
 {
   softwareUpdate = {
-    automaticallyDownloadNewUpdatesWhenAvailable = rec {
-      path = [
-        "System Settings"
-        "General"
-        "Software Update"
-        "Download new updates when available"
-      ];
-      description = "";
-
-      mapping = {
-        "unset" = {
-          command = "/usr/bin/defaults delete /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload";
-        };
-        "true" = {
-          command = "/usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true";
-        };
-        "false" = {
-          command = "/usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool false";
-        };
-      };
-
-      default = null;
-
-      option = lib.mkOption {
-        inherit description default;
-        type = lib.types.nullOr (lib.types.either lib.types.bool (lib.types.enum [ "unset" ]));
-      };
-
-      config = {
+    automaticallyDownloadNewUpdatesWhenAvailable =
+      let
+        plistPath = "/Library/Preferences/com.apple.SoftwareUpdate";
+        optionName = "AutomaticDownload";
+      in
+      abstractionsLib.mkBasicBoolOption {
+        path = [
+          "System Settings"
+          "General"
+          "Software Update"
+          "Download new updates when available"
+        ];
+        default = null;
         perUser = false;
-        command =
-          value:
-          if builtins.isNull value then
-            mapping."null".command
-          else if value == true then
-            mapping."true".command
-          else
-            mapping."false".command;
-      };
-    };
-
-    automaticallyInstallMacOSUpdates = rec {
-      path = [
-        "System Settings"
-        "General"
-        "Software Update"
-        "Install macOS updates"
-      ];
-      description = "";
-
-      mapping = {
-        "unset" = {
-          command = "/usr/bin/defaults delete /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates";
-        };
-        "true" = {
-          command = "/usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true";
-        };
-        "false" = {
-          command = "/usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool false";
-        };
+        unsetCommand = commandsLib.defaults.delete plistPath optionName;
+        trueCommand = commandsLib.defaults.write plistPath optionName "bool" "true";
+        falseCommand = commandsLib.defaults.write plistPath optionName "bool" "false";
       };
 
-      default = null;
-
-      option = lib.mkOption {
-        inherit description default;
-        type = lib.types.nullOr (lib.types.either lib.types.bool (lib.types.enum [ "unset" ]));
-      };
-
-      config = {
+    automaticallyInstallMacOSUpdates =
+      let
+        plistPath = "/Library/Preferences/com.apple.SoftwareUpdate";
+        optionName = "AutomaticallyInstallMacOSUpdates";
+      in
+      abstractionsLib.mkBasicBoolOption {
+        path = [
+          "System Settings"
+          "General"
+          "Software Update"
+          "Install macOS updates"
+        ];
+        default = null;
         perUser = false;
-        command =
-          value:
-          if builtins.isNull value then
-            mapping."null".command
-          else if value == true then
-            mapping."true".command
-          else
-            mapping."false".command;
-      };
-    };
-
-    automaticallyInstallApplicationUpdatesFromTheAppStore = rec {
-      path = [
-        "System Settings"
-        "General"
-        "Software Update"
-        "Install application updates from the App Store"
-      ];
-      description = "";
-
-      mapping = {
-        "unset" = {
-          command = "/usr/bin/defaults delete /Library/Preferences/com.apple.commerce AutoUpdate";
-        };
-        "true" = {
-          command = "/usr/bin/defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool true";
-        };
-        "false" = {
-          command = "/usr/bin/defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool false";
-        };
+        unsetCommand = commandsLib.defaults.delete plistPath optionName;
+        trueCommand = commandsLib.defaults.write plistPath optionName "bool" "true";
+        falseCommand = commandsLib.defaults.write plistPath optionName "bool" "false";
       };
 
-      default = null;
-
-      option = lib.mkOption {
-        inherit description default;
-        type = lib.types.nullOr (lib.types.either lib.types.bool (lib.types.enum [ "unset" ]));
-      };
-
-      config = {
+    automaticallyInstallApplicationUpdatesFromTheAppStore =
+      let
+        plistPath = "/Library/Preferences/com.apple.commerce";
+        optionName = "AutoUpdate";
+      in
+      abstractionsLib.mkBasicBoolOption {
+        path = [
+          "System Settings"
+          "General"
+          "Software Update"
+          "Install application updates from the App Store"
+        ];
+        default = null;
         perUser = false;
-        command =
-          value:
-          if builtins.isNull value then
-            mapping."null".command
-          else if value == true then
-            mapping."true".command
-          else
-            mapping."false".command;
-      };
-    };
-
-    automaticallyInstallSecurityResponseAndSystemFiles = rec {
-      path = [
-        "System Settings"
-        "General"
-        "Software Update"
-        "Install Security Response and system files"
-      ];
-      description = "";
-
-      mapping = {
-        "unset" = {
-          command = "/usr/bin/defaults delete /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall";
-        };
-        "true" = {
-          command = "/usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true";
-        };
-        "false" = {
-          command = "/usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool false";
-        };
+        unsetCommand = commandsLib.defaults.delete plistPath optionName;
+        trueCommand = commandsLib.defaults.write plistPath optionName "bool" "true";
+        falseCommand = commandsLib.defaults.write plistPath optionName "bool" "false";
       };
 
-      default = null;
-
-      option = lib.mkOption {
-        inherit description default;
-        type = lib.types.nullOr (lib.types.either lib.types.bool (lib.types.enum [ "unset" ]));
-      };
-
-      config = {
+    automaticallyInstallSecurityResponseAndSystemFiles =
+      let
+        plistPath = "/Library/Preferences/com.apple.SoftwareUpdate";
+        optionName = "CriticalUpdateInstall";
+      in
+      abstractionsLib.mkBasicBoolOption {
+        path = [
+          "System Settings"
+          "General"
+          "Software Update"
+          "Install Security Response and system files"
+        ];
+        default = null;
         perUser = false;
-        command =
-          value:
-          if builtins.isNull value then
-            mapping."null".command
-          else if value == true then
-            mapping."true".command
-          else
-            mapping."false".command;
+        unsetCommand = commandsLib.defaults.delete plistPath optionName;
+        trueCommand = commandsLib.defaults.write plistPath optionName "bool" "true";
+        falseCommand = commandsLib.defaults.write plistPath optionName "bool" "false";
       };
-    };
   };
 
   dateAndTime = {
     # TODO setTimeAndDateAutomatically
     # TODO source
     # TODO dateAndTime
-    "24HourTime" = rec {
-      path = [
-        "System"
-        "Date & Time"
-        "24-hour time"
-      ];
-      description = "";
-
-      mapping = {
-        "unset" = {
-          command = "/usr/bin/defaults delete ~/Library/Preferences/ByHost/.GlobalPreferences AppleICUForce24HourTime";
-        };
-        "true" = {
-          command = "/usr/bin/defaults write ~/Library/Preferences/ByHost/.GlobalPreferences AppleICUForce24HourTime -bool true";
-        };
-        "false" = {
-          command = "/usr/bin/defaults write ~/Library/Preferences/ByHost/.GlobalPreferences AppleICUForce24HourTime -bool false";
-        };
-      };
-
-      default = null;
-
-      option = lib.mkOption {
-        inherit description default;
-        type = lib.types.nullOr (lib.types.either lib.types.bool (lib.types.enum [ "unset" ]));
-      };
-
-      config = {
+    "24HourTime" =
+      let
+        plistPath = pathLib.generatePath true true ".GlobalPreferences";
+        optionName = "AppleICUForce24HourTime";
+      in
+      abstractionsLib.mkBasicBoolOption {
+        path = [
+          "System"
+          "Date & Time"
+          "24-hour time"
+        ];
+        default = null;
         perUser = true;
-        command =
-          value:
-          if builtins.isNull value then
-            mapping."null".command
-          else if value == true then
-            mapping."true".command
-          else
-            mapping."false".command;
+        unsetCommand = commandsLib.defaults.delete plistPath optionName;
+        trueCommand = commandsLib.defaults.write plistPath optionName "bool" "true";
+        falseCommand = commandsLib.defaults.write plistPath optionName "bool" "false";
       };
-    };
     # TODO show24HourTimeOnLockScreen
     # TODO setTimeZoneAutomaticallyUsingCurrentLocation
     # TODO timeZone

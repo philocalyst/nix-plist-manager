@@ -4,6 +4,7 @@
   pathLib,
   typesLib,
   configLib,
+  ...
 }:
 let
   byHostGlobalPreferences = pathLib.generatePath true true ".GlobalPreferences";

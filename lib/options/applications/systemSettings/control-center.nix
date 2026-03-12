@@ -1,5 +1,7 @@
-{ lib, commandsLib }:
+{ lib, commandsLib, pathLib, typesLib, configLib, abstractionsLib }:
 let
+  controlCenterPath = pathLib.generatePath true true "com.apple.controlcenter";
+
   calculateBitmaskValue =
     boolOptions: bitmaskMap:
     lib.foldl' builtins.bitOr 0 (
@@ -37,21 +39,21 @@ let
 
     mapping = {
       "unset" = {
-        command = commandsLib.defaults.delete "~/Library/Preferences/ByHost/com.apple.controlcenter" optionName;
+        command = commandsLib.defaults.delete controlCenterPath optionName;
       };
       "always" = {
         command =
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" optionName "int"
+          commandsLib.defaults.write controlCenterPath optionName "int"
             "18";
       };
       "active" = {
         command =
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" optionName "int"
+          commandsLib.defaults.write controlCenterPath optionName "int"
             "24";
       };
       "never" = {
         command =
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" optionName "int"
+          commandsLib.defaults.write controlCenterPath optionName "int"
             "24";
       };
     };
@@ -80,16 +82,16 @@ let
 
     mapping = {
       "unset" = {
-        command = commandsLib.defaults.delete "~/Library/Preferences/ByHost/com.apple.controlcenter" optionName;
+        command = commandsLib.defaults.delete controlCenterPath optionName;
       };
       "true" = {
         command =
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" optionName "int"
+          commandsLib.defaults.write controlCenterPath optionName "int"
             "18";
       };
       "false" = {
         command =
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" optionName "int"
+          commandsLib.defaults.write controlCenterPath optionName "int"
             "24";
       };
     };
@@ -126,12 +128,12 @@ let
       lib.mapAttrs (name: bitValue: {
         description = "System Settings > Control Center > ${options.name} > ${name}";
         command =
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" options.key "int"
+          commandsLib.defaults.write controlCenterPath options.key "int"
             (toString bitValue);
       }) options.mapping
       // {
         "unset" = {
-          command = commandsLib.defaults.delete "~/Library/Preferences/ByHost/com.apple.controlcenter" options.key;
+          command = commandsLib.defaults.delete controlCenterPath options.key;
         };
       };
 
@@ -170,9 +172,9 @@ let
         if builtins.isNull value then
           null
         else if value == "unset" then
-          commandsLib.defaults.delete "~/Library/Preferences/ByHost/com.apple.controlcenter" options.key
+          commandsLib.defaults.delete controlCenterPath options.key
         else
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" options.key "int"
+          commandsLib.defaults.write controlCenterPath options.key "int"
             (toString value);
     };
   };
@@ -252,12 +254,12 @@ in
 
     mapping = {
       "unset" = {
-        command = commandsLib.defaults.delete "~/Library/Preferences/ByHost/com.apple.controlcenter" "Battery";
+        command = commandsLib.defaults.delete controlCenterPath "Battery";
       };
       "{ showInMenuBar = true; showInControlCenter = false }" = {
         command =
           value:
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" "Battery" "int"
+          commandsLib.defaults.write controlCenterPath "Battery" "int"
             (mapBatteryValue {
               showInMenuBar = true;
               showInControlCenter = false;
@@ -266,7 +268,7 @@ in
       "{ showInMenuBar = false; showInControlCenter = true }" = {
         command =
           value:
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" "Battery" "int"
+          commandsLib.defaults.write controlCenterPath "Battery" "int"
             (mapBatteryValue {
               showInMenuBar = false;
               showInControlCenter = true;
@@ -275,7 +277,7 @@ in
       "{ showInMenuBar = true; showInControlCenter = true }" = {
         command =
           value:
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" "Battery" "int"
+          commandsLib.defaults.write controlCenterPath "Battery" "int"
             (mapBatteryValue {
               showInMenuBar = true;
               showInControlCenter = true;
@@ -284,7 +286,7 @@ in
       "{ showInMenuBar = false; showInControlCenter = false }" = {
         command =
           value:
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" "Battery" "int"
+          commandsLib.defaults.write controlCenterPath "Battery" "int"
             (mapBatteryValue {
               showInMenuBar = false;
               showInControlCenter = false;
@@ -324,9 +326,9 @@ in
         if builtins.isNull value then
           null
         else if value == "unset" then
-          commandsLib.defaults.delete "~/Library/Preferences/ByHost/com.apple.controlcenter" "Battery"
+          commandsLib.defaults.delete controlCenterPath "Battery"
         else
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter" "Battery" "int" (
+          commandsLib.defaults.write controlCenterPath "Battery" "int" (
             toString value
           );
     };
@@ -343,18 +345,18 @@ in
 
     mapping = {
       "unset" = {
-        command = commandsLib.defaults.delete "~/Library/Preferences/ByHost/com.apple.controlcenter" "BatteryShowPercentage";
+        command = commandsLib.defaults.delete controlCenterPath "BatteryShowPercentage";
       };
       "true" = {
         command =
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter"
+          commandsLib.defaults.write controlCenterPath
             "BatteryShowPercentage"
             "bool"
             "true";
       };
       "false" = {
         command =
-          commandsLib.defaults.write "~/Library/Preferences/ByHost/com.apple.controlcenter"
+          commandsLib.defaults.write controlCenterPath
             "BatteryShowPercentage"
             "bool"
             "false";
