@@ -40,5 +40,10 @@ in
         focus = import ./options/applications/systemSettings/focus.nix allLibs;
       };
       finder = import ./options/applications/finder.nix allLibs;
+      music = import ./options/applications/music.nix allLibs;
+      ice = import ./options/applications/ice.nix allLibs;
+      calendar = import ./options/applications/calendar.nix allLibs;
+      wallpaper = import ./options/applications/wallpaper.nix allLibs;
+      things = import ./options/applications/things.nix allLibs;
     };
 }

@@ -73,8 +73,46 @@ in
           ];
         };
       };
-      # newFinderWindowsShow
-      # syncDesktopAndDocumentsFolders
+      newFinderWindowTarget = abstractionsLib.mkBasicMappingOption {
+        default = null;
+        perUser = true;
+        path = [
+          "Finder"
+          "Settings"
+          "General"
+          "New Finder windows show"
+        ];
+        mapping =
+          let
+            optionName = "NewWindowTarget";
+          in
+          {
+            "unset" = {
+              command = commandsLib.defaults.delete finderPath optionName;
+            };
+            "Computer" = {
+              command = commandsLib.defaults.write finderPath optionName "string" "PfCm";
+            };
+            "Home" = {
+              command = commandsLib.defaults.write finderPath optionName "string" "PfHm";
+            };
+            "Desktop" = {
+              command = commandsLib.defaults.write finderPath optionName "string" "PfDe";
+            };
+            "Documents" = {
+              command = commandsLib.defaults.write finderPath optionName "string" "PfDo";
+            };
+            "iCloud Drive" = {
+              command = commandsLib.defaults.write finderPath optionName "string" "PfID";
+            };
+            "Recents" = {
+              command = commandsLib.defaults.write finderPath optionName "string" "PfAF";
+            };
+            "Other" = {
+              command = commandsLib.defaults.write finderPath optionName "string" "PfLo";
+            };
+          };
+      };
       openFoldersInTabsInsteadOfNewWindows = mkBool finderPath "FinderSpawnTab" // {
         path = [
           "Finder"
@@ -228,6 +266,86 @@ in
           "Show Status Bar"
         ];
       };
+    };
+  };
+  preferences = {
+    showHiddenFiles = mkBool finderPath "AppleShowAllFiles" // {
+      path = [
+        "Finder"
+        "Preferences"
+        "Show hidden files"
+      ];
+    };
+
+    showPosixPathInTitle = mkBool finderPath "_FXShowPosixPathInTitle" // {
+      path = [
+        "Finder"
+        "Preferences"
+        "Show POSIX path in title"
+      ];
+    };
+
+    preferredViewStyle = abstractionsLib.mkBasicMappingOption {
+      default = null;
+      perUser = true;
+      path = [
+        "Finder"
+        "Preferences"
+        "Preferred view style"
+      ];
+      mapping =
+        let
+          optionName = "FXPreferredViewStyle";
+        in
+        {
+          "unset" = {
+            command = commandsLib.defaults.delete finderPath optionName;
+          };
+          "Icon" = {
+            command = commandsLib.defaults.write finderPath optionName "string" "icnv";
+          };
+          "List" = {
+            command = commandsLib.defaults.write finderPath optionName "string" "Nlsv";
+          };
+          "Column" = {
+            command = commandsLib.defaults.write finderPath optionName "string" "clmv";
+          };
+          "Gallery" = {
+            command = commandsLib.defaults.write finderPath optionName "string" "glyv";
+          };
+        };
+    };
+
+    createDesktop = mkBool finderPath "CreateDesktop" // {
+      path = [
+        "Finder"
+        "Preferences"
+        "Create Desktop"
+      ];
+    };
+
+    quitMenuItem = mkBool finderPath "QuitMenuItem" // {
+      path = [
+        "Finder"
+        "Preferences"
+        "Quit menu item"
+      ];
+    };
+
+    iCloudDriveDesktop = mkBool finderPath "FXICloudDriveDesktop" // {
+      path = [
+        "Finder"
+        "Preferences"
+        "iCloud Drive Desktop sync"
+      ];
+    };
+
+    iCloudDriveDocuments = mkBool finderPath "FXICloudDriveDocuments" // {
+      path = [
+        "Finder"
+        "Preferences"
+        "iCloud Drive Documents sync"
+      ];
     };
   };
 }
