@@ -15,7 +15,7 @@ in
       "Wallpaper"
       "System Wallpaper URL"
     ];
-    description = "";
+    description = "The file path to the system wallpaper. Logic handles file:// prefix and space encoding.";
 
     mapping =
       let
@@ -26,7 +26,15 @@ in
           command = commandsLib.defaults.delete plistPath optionName;
         };
         "value" = {
-          command = value: commandsLib.defaults.write plistPath optionName "string" value;
+          command =
+            value:
+            let
+              # Encode spaces for URL compatibility
+              encoded = lib.replaceStrings [ " " ] [ "%20" ] value;
+              # Ensure file:// prefix exists
+              url = if lib.hasPrefix "file://" encoded then encoded else "file://${encoded}";
+            in
+            commandsLib.defaults.write plistPath optionName "string" url;
         };
       };
 
