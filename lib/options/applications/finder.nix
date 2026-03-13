@@ -11,341 +11,352 @@ let
   finderPath = pathLib.generatePath true true "com.apple.finder";
   birdPath = pathLib.generatePath true true "com.apple.bird";
 
-  mkBool = plistPath: key: abstractionsLib.mkBasicBoolOption {
-    path = plistPath;
-    default = null;
-    perUser = true;
-    unsetCommand = commandsLib.defaults.delete plistPath key;
-    trueCommand = commandsLib.defaults.write plistPath key "bool" "true";
-    falseCommand = commandsLib.defaults.write plistPath key "bool" "false";
-  };
+  # The three IconViewSettings subtrees that MUST stay in sync
+  iconViewKeyPaths =
+    key:
+    map (prefix: "${prefix}:IconViewSettings:${key}") [
+      ":DesktopViewSettings"
+      ":FK_StandardViewSettings"
+      ":StandardViewSettings"
+    ];
 
-  mkBoolInverted = plistPath: key: abstractionsLib.mkBasicBoolOption {
-    path = plistPath;
-    default = null;
-    perUser = true;
-    unsetCommand = commandsLib.defaults.delete plistPath key;
-    trueCommand = commandsLib.defaults.write plistPath key "bool" "false";
-    falseCommand = commandsLib.defaults.write plistPath key "bool" "true";
-  };
+  mkBool =
+    path: plistPath: key:
+    abstractionsLib.mkBasicBoolOption {
+      inherit path;
+      default = null;
+      perUser = true;
+      unsetCommand = commandsLib.defaults.delete plistPath key;
+      trueCommand = commandsLib.defaults.write plistPath key "bool" "true";
+      falseCommand = commandsLib.defaults.write plistPath key "bool" "false";
+    };
+
+  mkBoolInverted =
+    path: plistPath: key:
+    abstractionsLib.mkBasicBoolOption {
+      inherit path;
+      default = null;
+      perUser = true;
+      unsetCommand = commandsLib.defaults.delete plistPath key;
+      trueCommand = commandsLib.defaults.write plistPath key "bool" "false";
+      falseCommand = commandsLib.defaults.write plistPath key "bool" "true";
+    };
+
+  mkMapping =
+    path: mapping:
+    abstractionsLib.mkBasicMappingOption {
+      inherit path mapping;
+      default = null;
+      perUser = true;
+    };
+
+  mkIconViewBool =
+    path: key:
+    abstractionsLib.mkMultiPlistBuddyBoolOption {
+      inherit path;
+      plistFile = finderPath;
+      keyPaths = iconViewKeyPaths key;
+      default = null;
+      perUser = true;
+    };
+
+  mkIconViewInt =
+    path: key:
+    abstractionsLib.mkMultiPlistBuddyIntOption {
+      inherit path;
+      plistFile = finderPath;
+      keyPaths = iconViewKeyPaths key;
+      default = null;
+      perUser = true;
+    };
+
+  mkIconViewMapping =
+    path: key: mapping:
+    abstractionsLib.mkMultiPlistBuddyMappingOption {
+      inherit path mapping;
+      plistFile = finderPath;
+      keyPaths = iconViewKeyPaths key;
+      default = null;
+      perUser = true;
+    };
 in
 {
   settings = {
     general = {
       showTheseItemsOnTheDesktop = {
-        hardDisks = mkBool finderPath "ShowHardDrivesOnDesktop" // {
-          path = [
-            "Finder"
-            "Settings"
-            "General"
-            "Show these items on the desktop"
-            "Hard disks"
-          ];
-        };
-
-        externalDisks = mkBool finderPath "ShowExternalHardDrivesOnDesktop" // {
-          path = [
-            "Finder"
-            "Settings"
-            "General"
-            "Show these items on the desktop"
-            "External disks"
-          ];
-        };
-
-        cdsDvdsAndiPods = mkBool finderPath "ShowRemovableMediaOnDesktop" // {
-          path = [
-            "Finder"
-            "Settings"
-            "General"
-            "Show these items on the desktop"
-            "CDs, DVDs, and iPods"
-          ];
-        };
-
-        connectedServers = mkBool finderPath "ShowMountedServersOnDesktop" // {
-          path = [
-            "Finder"
-            "Settings"
-            "General"
-            "Show these items on the desktop"
-            "Connected servers"
-          ];
-        };
-      };
-      newFinderWindowTarget = abstractionsLib.mkBasicMappingOption {
-        default = null;
-        perUser = true;
-        path = [
+        hardDisks = mkBool [
           "Finder"
           "Settings"
           "General"
-          "New Finder windows show"
-        ];
-        mapping =
-          let
-            optionName = "NewWindowTarget";
-          in
-          {
-            "unset" = {
-              command = commandsLib.defaults.delete finderPath optionName;
-            };
-            "Computer" = {
-              command = commandsLib.defaults.write finderPath optionName "string" "PfCm";
-            };
-            "Home" = {
-              command = commandsLib.defaults.write finderPath optionName "string" "PfHm";
-            };
-            "Desktop" = {
-              command = commandsLib.defaults.write finderPath optionName "string" "PfDe";
-            };
-            "Documents" = {
-              command = commandsLib.defaults.write finderPath optionName "string" "PfDo";
-            };
-            "iCloud Drive" = {
-              command = commandsLib.defaults.write finderPath optionName "string" "PfID";
-            };
-            "Recents" = {
-              command = commandsLib.defaults.write finderPath optionName "string" "PfAF";
-            };
-            "Other" = {
-              command = commandsLib.defaults.write finderPath optionName "string" "PfLo";
-            };
-          };
-      };
-      openFoldersInTabsInsteadOfNewWindows = mkBool finderPath "FinderSpawnTab" // {
-        path = [
+          "Show these items on the desktop"
+          "Hard disks"
+        ] finderPath "ShowHardDrivesOnDesktop";
+
+        externalDisks = mkBool [
           "Finder"
           "Settings"
           "General"
-          "Open folders in tabs instead of new windows"
-        ];
+          "Show these items on the desktop"
+          "External disks"
+        ] finderPath "ShowExternalHardDrivesOnDesktop";
+
+        cdsDvdsAndiPods = mkBool [
+          "Finder"
+          "Settings"
+          "General"
+          "Show these items on the desktop"
+          "CDs, DVDs, and iPods"
+        ] finderPath "ShowRemovableMediaOnDesktop";
+
+        connectedServers = mkBool [
+          "Finder"
+          "Settings"
+          "General"
+          "Show these items on the desktop"
+          "Connected servers"
+        ] finderPath "ShowMountedServersOnDesktop";
       };
+
+      newFinderWindowTarget =
+        let
+          optionName = "NewWindowTarget";
+        in
+        mkMapping [ "Finder" "Settings" "General" "New Finder windows show" ] {
+          "unset".command = commandsLib.defaults.delete finderPath optionName;
+          "Computer".command = commandsLib.defaults.write finderPath optionName "string" "PfCm";
+          "Home".command = commandsLib.defaults.write finderPath optionName "string" "PfHm";
+          "Desktop".command = commandsLib.defaults.write finderPath optionName "string" "PfDe";
+          "Documents".command = commandsLib.defaults.write finderPath optionName "string" "PfDo";
+          "iCloud Drive".command = commandsLib.defaults.write finderPath optionName "string" "PfID";
+          "Recents".command = commandsLib.defaults.write finderPath optionName "string" "PfAF";
+          "Other".command = commandsLib.defaults.write finderPath optionName "string" "PfLo";
+        };
+
+      openFoldersInTabsInsteadOfNewWindows = mkBool [
+        "Finder"
+        "Settings"
+        "General"
+        "Open folders in tabs instead of new windows"
+      ] finderPath "FinderSpawnTab";
     };
+
     sidebar = {
-      recentTags = mkBool finderPath "ShowRecentTags" // {
-        path = [
-          "Finder"
-          "Settings"
-          "Sidebar"
-          "Show Recent Tags"
-        ];
-      };
+      recentTags = mkBool [
+        "Finder"
+        "Settings"
+        "Sidebar"
+        "Show Recent Tags"
+      ] finderPath "ShowRecentTags";
     };
+
     advanced = {
-      showAllFilenameExtensions = mkBool globalPreferencesPath "AppleShowAllExtensions" // {
-        path = [
-          "Finder"
-          "Settings"
-          "Advanced"
-          "Show all filename extensions"
-        ];
-      };
+      showAllFilenameExtensions = mkBool [
+        "Finder"
+        "Settings"
+        "Advanced"
+        "Show all filename extensions"
+      ] globalPreferencesPath "AppleShowAllExtensions";
 
-      showWarningBeforeChangingAnExtension = mkBool finderPath "FXEnableExtensionChangeWarning" // {
-        path = [
-          "Finder"
-          "Settings"
-          "Advanced"
-          "Show warning before changing an extension"
-        ];
-      };
+      showWarningBeforeChangingAnExtension = mkBool [
+        "Finder"
+        "Settings"
+        "Advanced"
+        "Show warning before changing an extension"
+      ] finderPath "FXEnableExtensionChangeWarning";
 
-      showWarningBeforeRemovingFromiCloudDrive = mkBoolInverted birdPath "FXEnableExtensionChangeWarning" // {
-        path = [
-          "Finder"
-          "Settings"
-          "Advanced"
-          "Show warning before removing from iCloud Drive"
-        ];
-      };
+      showWarningBeforeRemovingFromiCloudDrive = mkBoolInverted [
+        "Finder"
+        "Settings"
+        "Advanced"
+        "Show warning before removing from iCloud Drive"
+      ] birdPath "FXEnableExtensionChangeWarning";
 
-      showWarningBeforeEmptyingTheTrash = mkBool finderPath "WarnOnEmptyTrash" // {
-        path = [
-          "Finder"
-          "Settings"
-          "Advanced"
-          "Show warning before emptying the Trash"
-        ];
-      };
+      showWarningBeforeEmptyingTheTrash = mkBool [
+        "Finder"
+        "Settings"
+        "Advanced"
+        "Show warning before emptying the Trash"
+      ] finderPath "WarnOnEmptyTrash";
 
-      removeItemsFromTheTrashAfter30Days = mkBool finderPath "FXRemoveOldTrashItems" // {
-        path = [
-          "Finder"
-          "Settings"
-          "Advanced"
-          "Remove items from the Trash after 30 days"
-        ];
-      };
+      removeItemsFromTheTrashAfter30Days = mkBool [
+        "Finder"
+        "Settings"
+        "Advanced"
+        "Remove items from the Trash after 30 days"
+      ] finderPath "FXRemoveOldTrashItems";
 
       keepFoldersOnTop = {
-        inWindowsWhenSortingByName = mkBool finderPath "_FXSortFoldersFirst" // {
-          path = [
-            "Finder"
-            "Settings"
-            "Advanced"
-            "Keep folders on top"
-            "In windows when sorting by name"
-          ];
-        };
-        onDesktop = mkBool finderPath "_FXSortFoldersFirstOnDesktop" // {
-          path = [
-            "Finder"
-            "Settings"
-            "Advanced"
-            "Keep folders on top"
-            "On Desktop"
-          ];
-        };
-      };
-
-      whenPerformingASearch = abstractionsLib.mkBasicMappingOption {
-        default = null;
-        perUser = true;
-        path = [
+        inWindowsWhenSortingByName = mkBool [
           "Finder"
           "Settings"
           "Advanced"
-          "When performing a search"
-        ];
-        mapping =
-          let
-            optionName = "FXDefaultSearchScope";
-          in
-          {
-            "unset" = {
-              command = commandsLib.defaults.delete finderPath optionName;
-            };
-            "Search This Mac" = {
-              command = commandsLib.defaults.write finderPath optionName "string" "SCev";
-            };
-            "Search the Current Folder" = {
-              command = commandsLib.defaults.write finderPath optionName "string" "SCcf";
-            };
-            "Use the Previous Search Scope" = {
-              command = commandsLib.defaults.write finderPath optionName "string" "SCsp";
-            };
-          };
-      };
-    };
-  };
-  menuBar = {
-    view = {
-      showTabBar = mkBool finderPath "NSWindowTabbingShoudShowTabBarKey-com.apple.finder.TBrowserWindow" // {
-        path = [
+          "Keep folders on top"
+          "In windows when sorting by name"
+        ] finderPath "_FXSortFoldersFirst";
+
+        onDesktop = mkBool [
           "Finder"
-          "Menu Bar"
-          "View"
-          "Show Tab Bar"
-        ];
+          "Settings"
+          "Advanced"
+          "Keep folders on top"
+          "On Desktop"
+        ] finderPath "_FXSortFoldersFirstOnDesktop";
       };
 
-      showSidebar = mkBool finderPath "ShowSidebar" // {
-        path = [
-          "Finder"
-          "Menu Bar"
-          "View"
-          "Show Sidebar"
-        ];
-      };
-
-      showPathBar = mkBool finderPath "ShowPathBar" // {
-        path = [
-          "Finder"
-          "Menu Bar"
-          "View"
-          "Show Path Bar"
-        ];
-      };
-
-      showStatusBar = mkBool finderPath "ShowStatusBar" // {
-        path = [
-          "Finder"
-          "Menu Bar"
-          "View"
-          "Show Status Bar"
-        ];
-      };
-    };
-  };
-  preferences = {
-    showHiddenFiles = mkBool finderPath "AppleShowAllFiles" // {
-      path = [
-        "Finder"
-        "Preferences"
-        "Show hidden files"
-      ];
-    };
-
-    showPosixPathInTitle = mkBool finderPath "_FXShowPosixPathInTitle" // {
-      path = [
-        "Finder"
-        "Preferences"
-        "Show POSIX path in title"
-      ];
-    };
-
-    preferredViewStyle = abstractionsLib.mkBasicMappingOption {
-      default = null;
-      perUser = true;
-      path = [
-        "Finder"
-        "Preferences"
-        "Preferred view style"
-      ];
-      mapping =
+      whenPerformingASearch =
         let
-          optionName = "FXPreferredViewStyle";
+          optionName = "FXDefaultSearchScope";
         in
-        {
-          "unset" = {
-            command = commandsLib.defaults.delete finderPath optionName;
-          };
-          "Icon" = {
-            command = commandsLib.defaults.write finderPath optionName "string" "icnv";
-          };
-          "List" = {
-            command = commandsLib.defaults.write finderPath optionName "string" "Nlsv";
-          };
-          "Column" = {
-            command = commandsLib.defaults.write finderPath optionName "string" "clmv";
-          };
-          "Gallery" = {
-            command = commandsLib.defaults.write finderPath optionName "string" "glyv";
-          };
+        mkMapping [ "Finder" "Settings" "Advanced" "When performing a search" ] {
+          "unset".command = commandsLib.defaults.delete finderPath optionName;
+          "Search This Mac".command = commandsLib.defaults.write finderPath optionName "string" "SCev";
+          "Search the Current Folder".command =
+            commandsLib.defaults.write finderPath optionName "string"
+              "SCcf";
+          "Use the Previous Search Scope".command =
+            commandsLib.defaults.write finderPath optionName "string"
+              "SCsp";
+        };
+
+      groupBy =
+        let
+          optionName = "FXArrangeGroupViewBy";
+        in
+        mkMapping [ "Finder" "Settings" "Advanced" "Group by" ] {
+          "unset".command = commandsLib.defaults.delete finderPath optionName;
+          "Name".command = commandsLib.defaults.write finderPath optionName "string" "Name";
+          "Kind".command = commandsLib.defaults.write finderPath optionName "string" "Kind";
+          "Application".command = commandsLib.defaults.write finderPath optionName "string" "Application";
+          "Date Last Opened".command =
+            commandsLib.defaults.write finderPath optionName "string"
+              "dateLastOpened";
+          "Date Added".command = commandsLib.defaults.write finderPath optionName "string" "dateAdded";
+          "Date Modified".command = commandsLib.defaults.write finderPath optionName "string" "dateModified";
+          "Date Created".command = commandsLib.defaults.write finderPath optionName "string" "dateCreated";
+          "Size".command = commandsLib.defaults.write finderPath optionName "string" "size";
+          "Tags".command = commandsLib.defaults.write finderPath optionName "string" "label";
         };
     };
+  };
 
-    createDesktop = mkBool finderPath "CreateDesktop" // {
-      path = [
+  menuBar = {
+    view = {
+      showTabBar = mkBool [
         "Finder"
-        "Preferences"
-        "Create Desktop"
-      ];
+        "Menu Bar"
+        "View"
+        "Show Tab Bar"
+      ] finderPath "NSWindowTabbingShoudShowTabBarKey-com.apple.finder.TBrowserWindow";
+
+      showSidebar = mkBool [ "Finder" "Menu Bar" "View" "Show Sidebar" ] finderPath "ShowSidebar";
+
+      showPathBar = mkBool [ "Finder" "Menu Bar" "View" "Show Path Bar" ] finderPath "ShowPathBar";
+
+      showStatusBar = mkBool [ "Finder" "Menu Bar" "View" "Show Status Bar" ] finderPath "ShowStatusBar";
     };
+  };
 
-    quitMenuItem = mkBool finderPath "QuitMenuItem" // {
-      path = [
+  preferences = {
+    showHiddenFiles = mkBool [
+      "Finder"
+      "Preferences"
+      "Show hidden files"
+    ] finderPath "AppleShowAllFiles";
+
+    showPosixPathInTitle = mkBool [
+      "Finder"
+      "Preferences"
+      "Show POSIX path in title"
+    ] finderPath "_FXShowPosixPathInTitle";
+
+    preferredViewStyle =
+      let
+        optionName = "FXPreferredViewStyle";
+      in
+      mkMapping [ "Finder" "Preferences" "Preferred view style" ] {
+        "unset".command = commandsLib.defaults.delete finderPath optionName;
+        "Icon".command = commandsLib.defaults.write finderPath optionName "string" "icnv";
+        "List".command = commandsLib.defaults.write finderPath optionName "string" "Nlsv";
+        "Column".command = commandsLib.defaults.write finderPath optionName "string" "clmv";
+        "Gallery".command = commandsLib.defaults.write finderPath optionName "string" "glyv";
+      };
+
+    createDesktop = mkBool [ "Finder" "Preferences" "Create Desktop" ] finderPath "CreateDesktop";
+
+    quitMenuItem = mkBool [ "Finder" "Preferences" "Quit menu item" ] finderPath "QuitMenuItem";
+
+    iCloudDriveDesktop = mkBool [
+      "Finder"
+      "Preferences"
+      "iCloud Drive Desktop sync"
+    ] finderPath "FXICloudDriveDesktop";
+
+    iCloudDriveDocuments = mkBool [
+      "Finder"
+      "Preferences"
+      "iCloud Drive Documents sync"
+    ] finderPath "FXICloudDriveDocuments";
+
+    iCloudDriveEnabled = mkBool [
+      "Finder"
+      "Preferences"
+      "iCloud Drive enabled"
+    ] finderPath "FXICloudDriveEnabled";
+
+    iconView = {
+      showItemInfo = mkIconViewBool [
         "Finder"
         "Preferences"
-        "Quit menu item"
-      ];
-    };
+        "Icon View"
+        "Show item info"
+      ] "showItemInfo";
 
-    iCloudDriveDesktop = mkBool finderPath "FXICloudDriveDesktop" // {
-      path = [
+      labelOnBottom = mkIconViewBool [
         "Finder"
         "Preferences"
-        "iCloud Drive Desktop sync"
-      ];
-    };
+        "Icon View"
+        "Label on bottom"
+      ] "labelOnBottom";
 
-    iCloudDriveDocuments = mkBool finderPath "FXICloudDriveDocuments" // {
-      path = [
-        "Finder"
-        "Preferences"
-        "iCloud Drive Documents sync"
-      ];
+      arrangeBy = mkIconViewMapping [ "Finder" "Preferences" "Icon View" "Arrange by" ] "arrangeBy" {
+        "unset" = {
+          unset = true;
+        };
+        "None" = {
+          value = "none";
+        };
+        "Name" = {
+          value = "name";
+        };
+        "Snap to Grid" = {
+          value = "grid";
+        };
+        "Date Modified" = {
+          value = "dateModified";
+        };
+        "Date Created" = {
+          value = "dateCreated";
+        };
+        "Date Last Opened" = {
+          value = "dateLastOpened";
+        };
+        "Date Added" = {
+          value = "dateAdded";
+        };
+        "Size" = {
+          value = "size";
+        };
+        "Kind" = {
+          value = "kind";
+        };
+        "Tags" = {
+          value = "label";
+        };
+      };
+
+      gridSpacing = mkIconViewInt [ "Finder" "Preferences" "Icon View" "Grid spacing" ] "gridSpacing";
+
+      iconSize = mkIconViewInt [ "Finder" "Preferences" "Icon View" "Icon size" ] "iconSize";
     };
   };
 }
