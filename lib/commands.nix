@@ -9,6 +9,15 @@
 
   chainOnSuccess = " && \\\n";
 
+  plistBuddy = {
+    set =
+      plistFile: keyPath: type: value:
+      "/usr/libexec/PlistBuddy -c 'Set ${keyPath} ${value}' ${plistFile} 2>/dev/null || /usr/libexec/PlistBuddy -c 'Add ${keyPath} ${type} ${value}' ${plistFile} 2>/dev/null || true";
+    delete =
+      plistFile: keyPath:
+      "/usr/libexec/PlistBuddy -c 'Delete ${keyPath}' ${plistFile} 2>/dev/null || true";
+  };
+
   osaScript = script: "/usr/bin/osascript -e ${lib.escapeShellArg script} 2>/dev/null || true";
 
   notifyUtilPost =

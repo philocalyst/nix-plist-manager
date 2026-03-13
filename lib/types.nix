@@ -14,6 +14,8 @@ rec {
       lib.types.either (lib.types.addCheck (lib.types.numbers.between minValue maxValue) lib.isFloat) unset
     );
 
+  nullOrInt = lib.types.nullOr (lib.types.either lib.types.int unset);
+
   nullOrMapping = mapping: lib.types.nullOr (lib.types.enum (lib.attrNames mapping));
 
   # TODO rename to nullOrEnumOrUnset

@@ -9,7 +9,6 @@
 let
   globalPreferencesPath = pathLib.generatePath true false ".GlobalPreferences";
   finderPath = pathLib.generatePath true true "com.apple.finder";
-  birdPath = pathLib.generatePath true true "com.apple.bird";
 
   # The three IconViewSettings subtrees that MUST stay in sync
   iconViewKeyPaths =
@@ -140,6 +139,38 @@ in
       ] finderPath "FinderSpawnTab";
     };
 
+    tags = {
+      favoriteTagNames = rec {
+        path = [
+          "Finder"
+          "Settings"
+          "Tags"
+          "Favorite Tags"
+        ];
+        description = "";
+        mapping = { };
+        default = null;
+        option = lib.mkOption {
+          inherit description default;
+          type = lib.types.nullOr (lib.types.listOf lib.types.str);
+        };
+        config = {
+          perUser = true;
+          command =
+            value:
+            if builtins.isNull value then
+              null
+            else
+              let
+                args = lib.concatMapStringsSep " " (
+                  tag: ''"${lib.escapeShellArg tag}"''
+                ) value;
+              in
+              "/usr/bin/defaults write ${finderPath} FavoriteTagNames -array ${args} 2>/dev/null || true";
+        };
+      };
+    };
+
     sidebar = {
       recentTags = mkBool [
         "Finder"
@@ -164,12 +195,12 @@ in
         "Show warning before changing an extension"
       ] finderPath "FXEnableExtensionChangeWarning";
 
-      showWarningBeforeRemovingFromiCloudDrive = mkBoolInverted [
+      showWarningBeforeRemovingFromiCloudDrive = mkBool [
         "Finder"
         "Settings"
         "Advanced"
         "Show warning before removing from iCloud Drive"
-      ] birdPath "FXEnableExtensionChangeWarning";
+      ] finderPath "FXEnableRemoveFromICloudDriveWarning";
 
       showWarningBeforeEmptyingTheTrash = mkBool [
         "Finder"

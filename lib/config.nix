@@ -18,5 +18,14 @@
     else
       mapping."value".command value;
 
+  commandNullOrInt =
+    unsetCommand: setCommand: value:
+    if builtins.isNull value then
+      null
+    else if value == "unset" then
+      unsetCommand
+    else
+      setCommand value;
+
   commandMapping = mapping: value: if builtins.isNull value then null else mapping.${value}.command;
 }
